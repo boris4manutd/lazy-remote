@@ -3,7 +3,7 @@ import { Nav, Platform } from 'ionic-angular';
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
 
-import { SystemPage, SoundPage, SettingsPage } from '../pages/pages';
+import { /*SystemPage, */SoundPage, SettingsPage } from '../pages/pages';
 
 @Component({
   templateUrl: 'app.html'
@@ -21,10 +21,9 @@ export class MyApp {
     // used for an example of ngFor and navigation
     this.pages = [
       { title: 'Sound', component: SoundPage },
-      { title: 'System', component: SystemPage },
+      /*{ title: 'System', component: SystemPage },*/
       { title: 'Settings', component: SettingsPage }
     ];
-
   }
 
   initializeApp() {

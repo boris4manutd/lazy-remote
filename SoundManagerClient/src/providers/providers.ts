@@ -1,3 +1,7 @@
-/**
- * Created by boris on 30.6.17..
- */
+import { Api } from './api';
+import { Settings } from './settings';
+
+export {
+  Api,
+  Settings
+}

@@ -2,8 +2,8 @@ import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams } from 'ionic-angular';
 import { Storage } from '@ionic/storage';
 import { Http } from '@angular/http';
-import 'rxjs/Rx';
-import { Common } from '../../classes/Common';
+import { Api } from '../../providers/providers';
+
 
 /**
  * Generated class for the SystemPage page.
@@ -16,75 +16,123 @@ import { Common } from '../../classes/Common';
   selector: 'page-system',
   templateUrl: 'system.html',
 })
-export class SystemPage extends Common {
+export class SystemPage {
 
   private systemOptions: any[];
 
-  constructor(private _navCtrl: NavController, private navParams: NavParams, private _storage: Storage, private _http: Http) {
-    super(_navCtrl, _storage, _http);
-
-
+  constructor(private _navCtrl: NavController, private navParams: NavParams, private _storage: Storage, private _http: Http, private api: Api) {
     this.systemOptions = [
       {
         name: "Shut Down",
-        method: this.ShutDown
+        method: this.ShutDown,
+        isActive: false
       },
       {
         name: "Reset",
-        method: this.Reset
+        method: this.Reset,
+        isActive: false
       },
       {
         name: "Sleep",
-        method: this.Sleep
+        method: this.Sleep,
+        isActive: false
       },
       {
         name: "Log off",
-        method: this.LogOff
+        method: this.LogOff,
+        isActive: false
       },
       {
         name: "Lock",
-        method: this.Lock
+        method: this.Lock,
+        isActive: false
       }
     ];
   }
 
   public ShutDown(): void {
+    if (this.systemOptions[0].isActive)
+      return;
+
+    this.systemOptions[0].isActive = true;
+
     let activateButton = (): void => {
-
+      this.systemOptions[0].isActive = false;
     };
-
-    this.PerformPostRequest("system", "shutdown", [], activateButton, activateButton);
-  }
-
-  public Lock(): void {
-    let activateButton = (): void => {
-
-    };
-    this.PerformPostRequest("system", "lock", [], activateButton, activateButton);
-
-  }
-
-  public  LogOff(): void {
-    let activateButton = (): void => {
-
-    };
-    this.PerformPostRequest("system", "logoff", [], activateButton, activateButton);
-
-  }
-
-  public Sleep(): void {
-    let activateButton = (): void => {
-
-    };
-    this.PerformPostRequest("system", "sleep", [], activateButton, activateButton);
-
+    this.PerformRequest("system/shutdown", {}, activateButton);
   }
 
   public Reset(): void {
-    let activateButton = (): void => {
+    if (this.systemOptions[1].isActive)
+      return;
 
+    this.systemOptions[1].isActive = true;
+
+
+    let activateButton = (): void => {
+      this.systemOptions[1].isActive = false;
     };
-    this.PerformPostRequest("system", "reset", [], activateButton, activateButton);
+
+    this.PerformRequest("system/reset", {}, activateButton);
+  }
+
+  public Sleep(): void {
+    if (this.systemOptions[2].isActive)
+      return;
+
+    this.systemOptions[2].isActive = true;
+
+
+    let activateButton = (): void => {
+      this.systemOptions[2].isActive = false;
+    };
+
+    this.PerformRequest("system/sleep", {}, activateButton);
+  }
+
+  public  LogOff(): void {
+    if (this.systemOptions[3].isActive)
+      return;
+
+    this.systemOptions[3].isActive = true;
+
+
+    let activateButton = (): void => {
+      this.systemOptions[3].isActive = false;
+    };
+    this.PerformRequest("system/logoff", {}, activateButton);
+  }
+
+  public Lock(): void {
+    if (this.systemOptions[4].isActive)
+      return;
+
+    this.systemOptions[4].isActive = true;
+
+    let activateButton = (): void => {
+      this.systemOptions[4].isActive = false;
+    };
+    this.PerformRequest("system/lock", {}, activateButton);
+  }
+
+  private PerformRequest(endpoint: string, data: any, activateButtonFunc?: ()=>void) {
+    this.api
+      .post(endpoint, data)
+      .subscribe(
+        (data)=> {
+          // succ
+          if (activateButtonFunc)
+            activateButtonFunc();
+        },
+        (err)=> {
+          // fail
+          if (activateButtonFunc)
+            activateButtonFunc();
+        },
+        ()=> {
+
+        }
+      );
   }
 
   ionViewDidLoad() {

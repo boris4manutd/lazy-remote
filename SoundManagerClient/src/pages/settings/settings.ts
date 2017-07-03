@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams } from 'ionic-angular';
-import { Storage } from '@ionic/storage';
+import { FormBuilder, FormGroup } from '@angular/forms';
+import { Settings } from "../../providers/providers";
 
 /**
  * Generated class for the SettingsPage page.
@@ -14,22 +15,58 @@ import { Storage } from '@ionic/storage';
   templateUrl: 'settings.html',
 })
 export class SettingsPage {
-  private serverAddress: string;
+  private form: FormGroup;
+  private options: any;
+  private settingsReady: boolean = false;
 
-  constructor(public navCtrl: NavController, public navParams: NavParams, private storage: Storage) {
-    storage.get('serverAddress').then((val) => {
-      if (val)
-        this.serverAddress = val;
-    });
+  constructor(public navCtrl: NavController,
+              public navParams: NavParams,
+              private settings: Settings,
+              public formBuilder: FormBuilder) {
+
   }
 
-  public Confirm(): void {
-    console.log(this.serverAddress);
-    this.storage.set('serverAddress', this.serverAddress);
+  public _buildForm(): void {
+    let group: any = {
+      apiAddress: [this.options.apiAddress],
+      apiPort: [this.options.apiPort]
+    };
 
+    this.form = this.formBuilder.group(group);
+
+    // Watch the form for changes, and
+    this.form.valueChanges.subscribe((v) => {
+      this.settings.merge(this.form.value);
+    });
   }
 
   ionViewDidLoad() {
     console.log('ionViewDidLoad SettingsPage');
+    // Build an empty form for the template to render
+    this.form = this.formBuilder.group({});
   }
+
+  ionViewWillEnter() {
+    // Build an empty form for the template to render
+    this.form = this.formBuilder.group({});
+
+    /*this.page = this.navParams.get('page') || this.page;
+     this.pageTitleKey = this.navParams.get('pageTitleKey') || this.pageTitleKey;*/
+
+    /*this.translate.get(this.pageTitleKey).subscribe((res) => {
+     this.pageTitle = res;
+     })*/
+
+    this.settings.load().then(() => {
+      this.settingsReady = true;
+      this.options = this.settings.allSettings;
+
+      this._buildForm();
+    });
+  }
+
+  ngOnChanges() {
+    console.log('Ng All Changes');
+  }
+
 }

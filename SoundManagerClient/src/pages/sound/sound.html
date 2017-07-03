@@ -41,5 +41,14 @@
         </button>
       </ion-col>
     </ion-row>
+    <ion-row>
+      <ion-col col-12>
+        <ion-range min="-50" max="50" step="1" pin="true" [(ngModel)]="balance" (ionChange)="BalanceChanged($event)">
+          <ion-icon class="rotate-180" small range-left name="md-volume-up"></ion-icon>
+          <ion-icon small range-right name="md-volume-up"></ion-icon>
+        </ion-range>
+      </ion-col>
+    </ion-row>
+
   </ion-grid>
 </ion-content>

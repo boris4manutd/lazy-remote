@@ -1,3 +1,6 @@
-export var config = {
-  //serverAddress:
+export var AppConfig = {
+  apiAddress: null,
+  apiPort: null
 };
+
+

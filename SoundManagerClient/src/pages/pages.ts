@@ -1,3 +1,9 @@
-export { SettingsPage } from './settings/settings';
-export { SoundPage } from './sound/sound';
-export { SystemPage } from './system/system';
+import { SettingsPage } from './settings/settings';
+import { SoundPage } from './sound/sound';
+import { SystemPage } from './system/system';
+
+export {
+  SettingsPage,
+  SoundPage,
+  SystemPage
+}

@@ -1,9 +1,10 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, ToastController } from 'ionic-angular';
 import { Storage } from '@ionic/storage';
-import { Http } from '@angular/http';
+
 import 'rxjs/Rx';
-import { Common } from '../../classes/Common';
+
+import { Api, Settings } from "../../providers/providers";
 
 /**
  * Generated class for the SoundPage page.
@@ -16,15 +17,18 @@ import { Common } from '../../classes/Common';
   selector: 'page-sound',
   templateUrl: 'sound.html',
 })
-export class SoundPage extends Common {
+export class SoundPage {
 
   private isVolumeDownPressed: boolean;
   private isVolumeUpPressed: boolean;
   private isVolumeMutePressed: boolean;
   private isVolumeUnmutePressed: boolean;
 
-  constructor(public _navCtrl: NavController, public _navParams: NavParams, private _storage: Storage, private _http: Http) {
-    super(_navCtrl, _storage, _http);
+  private balance: number;
+
+  private serverNotSet: boolean = false;
+
+  constructor(public navCtrl: NavController, public navParams: NavParams, private storage: Storage, private api: Api, public toastCtrl: ToastController) {
 
     this.isVolumeDownPressed = this.isVolumeUpPressed = this.isVolumeMutePressed = this.isVolumeUnmutePressed = false;
   }
@@ -35,7 +39,7 @@ export class SoundPage extends Common {
       this.isVolumeUpPressed = false;
     };
 
-    this.PerformPostRequest("volume", "up",[], activateButton, activateButton);
+    this.PerformRequest("volume/up", {}, activateButton);
   }
 
   public VolumeDown(): void {
@@ -44,7 +48,7 @@ export class SoundPage extends Common {
       this.isVolumeDownPressed = false;
     };
 
-    this.PerformPostRequest("volume", "down",[], activateButton, activateButton);
+    this.PerformRequest("volume/down", {}, activateButton);
   }
 
   public VolumeMute(): void {
@@ -53,7 +57,7 @@ export class SoundPage extends Common {
       this.isVolumeMutePressed = false;
     };
 
-    this.PerformPostRequest("volume", "mute",[], activateButton, activateButton);
+    this.PerformRequest("volume/mute", {}, activateButton);
   }
 
   public VolumeUnmute(): void {
@@ -62,11 +66,58 @@ export class SoundPage extends Common {
       this.isVolumeUnmutePressed = false;
     };
 
-    this.PerformPostRequest("volume", "unmute",[], activateButton, activateButton);
+    this.PerformRequest("volume/unmute", {}, activateButton);
   }
 
-  ionViewDidLoad() {
+  public BalanceChanged($event): void {
 
+    var a = function () {
+    };
+
+    this.PerformRequest("volume/balance", "balance=" + this.balance);
+
+    //*/ { "balance": this.balance }
+    //this.PerformPostRequest("volume", "balance", "balance=" + this.balance, a, a);
+  }
+
+  private PerformRequest(endpoint: string, data: any, activateButtonFunc?: ()=>void) {
+
+    if(this.serverNotSet) {
+      if (activateButtonFunc)
+        activateButtonFunc();
+      return;
+    }
+    this.api
+      .post(endpoint, data)
+      .subscribe(
+        (data)=> {
+          // succ
+          if (activateButtonFunc)
+            activateButtonFunc();
+        },
+        (err)=> {
+          // fail
+          if (activateButtonFunc)
+            activateButtonFunc();
+
+          this.serverNotSet = true;
+
+          let toast = this.toastCtrl.create({
+            message: "Server can't be reached at provided address, please fill address and port(if needed) on Settings page.",
+            duration: 3000,
+            position: 'top'
+          });
+          toast.present();
+        },
+        ()=> {
+
+        }
+      );
+  }
+
+
+  ionViewDidLoad() {
+    console.log('sound - ionViewDidLoad');
   }
 
 }

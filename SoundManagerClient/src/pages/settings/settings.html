@@ -13,17 +13,25 @@
     </ion-navbar>
 </ion-header>
 
-<ion-content>
+<ion-content padding>
     <form [formGroup]="form" *ngIf="settingsReady">
-        <ion-list>
-            <ion-item>
-                <ion-label stacked>Computer address</ion-label>
-                <ion-input type="text" formControlName="apiAddress"></ion-input>
-            </ion-item>
-            <ion-item>
-                <ion-label stacked>Computer port</ion-label>
-                <ion-input type="number" formControlName="apiPort"></ion-input>
-            </ion-item>
-        </ion-list>
+        <ion-grid>
+            <ion-row>
+                <ion-col col-12>
+                    <ion-item no-padding>
+                        <ion-label stacked>Computer address</ion-label>
+                        <ion-input type="text" formControlName="apiAddress"></ion-input>
+                    </ion-item>
+                </ion-col>
+            </ion-row>
+            <ion-row>
+                <ion-col col-12>
+                    <ion-item no-padding>
+                        <ion-label stacked>Computer port</ion-label>
+                        <ion-input type="number" formControlName="apiPort"></ion-input>
+                    </ion-item>
+                </ion-col>
+            </ion-row>
+        </ion-grid>
     </form>
 </ion-content>

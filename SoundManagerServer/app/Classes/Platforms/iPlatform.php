@@ -7,7 +7,7 @@ interface iPlatform
 	// sound controlls
     public function GetStatus();
 
-    public function isMuted();
+    public function GetIsMuted();
 
     public function GetBalance();
     public function SetBalance($balance);

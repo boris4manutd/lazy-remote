@@ -2,7 +2,7 @@
 
 namespace App\Classes\Platforms;
 
-class Linux
+class Linux implements iPlatform
 {
     const
         VOLUME_MAX = 65536,
@@ -16,7 +16,8 @@ class Linux
     private
         $volume,
         $isMuted,
-        $balance;
+        $balance,
+        $platformInfo;
 
     public function __construct()
     {
@@ -132,11 +133,8 @@ class Linux
         // we make them equal in case balance is 0, and only one will be decreased
         $this->volume['left'] = $this->volume['right'] = $currMaxVol;
 
-        if ($this->balance == 0)
-        {
-        }
-        elseif ($this->balance > 0)
-        {
+        if ($this->balance == 0) {
+        } elseif ($this->balance > 0) {
             // decrease left volume
             $this->volume['left'] -= $volumeCoef;
 
@@ -145,9 +143,7 @@ class Linux
 
             if ($this->volume['left'] < 0)
                 $this->volume['left'] = 0;
-        }
-        else
-        {
+        } else {
             // decrease right volume
             $this->volume['right'] -= $volumeCoef;
 
@@ -188,26 +184,20 @@ class Linux
         $volumeLeftWithPercent = substr($volumeLeft, $posLeftStart + 1, 3);
         $volumeRightWithPercent = substr($volumeRight, $posRightStart + 1, 3);
 
-        $this->volume = ["left"  => (int) strtr($volumeLeftWithPercent, array("]" => "", "%" => "")),
-                         "right" => (int) strtr($volumeRightWithPercent, array("]" => "", "%" => ""))];
+        $this->volume = ["left" => (int)strtr($volumeLeftWithPercent, array("]" => "", "%" => "")),
+            "right" => (int)strtr($volumeRightWithPercent, array("]" => "", "%" => ""))];
 
         // balance
-        if ($this->volume['left'] == $this->volume['right'])
-        {
+        if ($this->volume['left'] == $this->volume['right']) {
             $this->balance = 0;
-        }
-        else
-        {
+        } else {
             $max = $min = 0;
             $sign = null;
-            if ($this->volume['left'] > $this->volume['right'])
-            {
+            if ($this->volume['left'] > $this->volume['right']) {
                 $max = $this->volume['left'];
                 $min = $this->volume['right'];
                 $sign = -1;
-            }
-            else
-            {
+            } else {
                 $min = $this->volume['left'];
                 $max = $this->volume['right'];
                 $sign = +1;
@@ -218,6 +208,13 @@ class Linux
 
             $this->balance = $diffInPercent * $sign;
         }
+
+        // system
+        $this->platformInfo = [
+            "os" => php_uname('s'),
+            "hostname" => php_uname('n'),
+            "machinetype" => php_uname('m')
+        ];
     }
 
     /**
@@ -230,8 +227,9 @@ class Linux
         $volume = $this->volume;
         $balance = $this->balance;
         $isMuted = $this->isMuted;
+        $platformInfo = $this->platformInfo;
 
-        return compact("volume", "balance", "isMuted");
+        return compact("platformInfo", "volume", "balance", "isMuted");
     }
 
     // system controlls (for linux, is needed root credentials for now ill be on hold).

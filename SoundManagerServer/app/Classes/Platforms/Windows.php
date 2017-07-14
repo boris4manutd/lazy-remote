@@ -4,12 +4,10 @@ namespace App\Classes\Platforms;
 
 class Windows implements IPlatform
 {
+    use tPlatform;
+
     private
-        $nirCmd,
-        $volume,
-        $isMuted,
-        $balance,
-        $platformInfo;
+        $nirCmd;
 
     const VOLUME_MAX = 65536;
     const VOLUME_MIN = 0;
@@ -32,11 +30,7 @@ class Windows implements IPlatform
         $this->balance = 0;
 
         // system
-        $this->platformInfo = [
-            "os" => php_uname('s'),
-            "hostname" => php_uname('n'),
-            "machinetype" => php_uname('m')
-        ];
+        $this->SetPlatformInfo();
     }
 
     public function VolumeUp()
@@ -99,9 +93,15 @@ class Windows implements IPlatform
         /*$volume = $this->volume;
         $balance = $this->balance;
         $isMuted = $this->isMuted;*/
+
+        // hardcoded values for now
+        $volume = 100;
+        $balance = 0;
+        $isMuted = false;
+
         $platformInfo = $this->platformInfo;
 
-        return compact("platformInfo");
+        return compact("platformInfo", "balance", "isMuted", "volume");
     }
 
     // system controlls

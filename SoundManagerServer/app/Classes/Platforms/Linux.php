@@ -4,6 +4,8 @@ namespace App\Classes\Platforms;
 
 class Linux implements iPlatform
 {
+    use tPlatform;
+
     const
         VOLUME_MAX = 65536,
         VOLUME_MIN = 0,
@@ -12,12 +14,6 @@ class Linux implements iPlatform
         BALANCE_MAX = 50, // right
         BALANCE_MIN = -50, // left
         BALANCE_DEF = 0;
-
-    private
-        $volume,
-        $isMuted,
-        $balance,
-        $platformInfo;
 
     public function __construct()
     {
@@ -214,11 +210,7 @@ class Linux implements iPlatform
         }
 
         // system
-        $this->platformInfo = [
-            "os" => php_uname('s'),
-            "hostname" => php_uname('n'),
-            "machinetype" => php_uname('m')
-        ];
+        $this->SetPlatformInfo();
     }
 
     /**

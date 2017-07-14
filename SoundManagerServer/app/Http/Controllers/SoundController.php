@@ -78,11 +78,15 @@ class SoundController extends Controller
     public function MuteVolume()
     {
         $this->platform->VolumeMute();
+
+        return $this->platform->GetStatus();
     }
 
     public function UnmuteVolume()
     {
         $this->platform->VolumeUnmute();
+
+        return $this->platform->GetStatus();
     }
 
     public function BalanceSet(Request $request)

@@ -24,7 +24,7 @@ $app->get('/', function () use ($app)
 
 $app->group(['prefix' => 'volume'], function () use ($app)
 {
-    $app->post('', 'SoundController@VolumeStatus');
+    $app->get('', 'SoundController@VolumeStatus');
 
     $app->post('get', 'SoundController@VolumeGet');
 

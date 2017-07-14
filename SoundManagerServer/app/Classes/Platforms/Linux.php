@@ -53,6 +53,8 @@ class Linux implements iPlatform
     public function VolumeMute()
     {
         shell_exec("amixer -D pulse sset Master mute");
+
+        $this->isMuted = true;
     }
 
     /**
@@ -62,6 +64,8 @@ class Linux implements iPlatform
     public function VolumeUnmute()
     {
         shell_exec("amixer -D pulse sset Master unmute");
+
+        $this->isMuted = false;
     }
 
     /**

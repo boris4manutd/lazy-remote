@@ -44,7 +44,7 @@ export class SoundPage {
       this.isVolumeUpPressed = false;
     };
 
-    this.PerformRequest("volume/up", {}, activateButton);
+    this.PerformRequest("volume/up", "balance=" + this.balance, activateButton);
   }
 
   public VolumeDown(): void {
@@ -53,7 +53,7 @@ export class SoundPage {
       this.isVolumeDownPressed = false;
     };
 
-    this.PerformRequest("volume/down", {}, activateButton);
+    this.PerformRequest("volume/down", "balance=" + this.balance, activateButton);
   }
 
   public VolumeMute(): void {

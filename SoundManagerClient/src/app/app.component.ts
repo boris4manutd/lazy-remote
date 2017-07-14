@@ -4,6 +4,7 @@ import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
 
 import { /*SystemPage, */SoundPage, SettingsPage } from '../pages/pages';
+import { Api, Settings } from '../providers/providers';
 
 @Component({
   templateUrl: 'app.html'
@@ -32,6 +33,8 @@ export class MyApp {
       // Here you can do any higher level native things you might need.
       this.statusBar.styleDefault();
       this.splashScreen.hide();
+      /*console.info('ready!');
+       this.rootPage = SettingsPage;*/
     });
   }
 

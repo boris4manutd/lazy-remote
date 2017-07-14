@@ -9,26 +9,44 @@ export class Api {
 
   constructor(public http: Http,
               private settings: Settings) {
+    console.info('api provider constructor');
     this.initUrl();
+  }
+
+  public setAddress(address: string, port: string) {
+    if (address.indexOf('http://') !== 0 && address.indexOf('https://') !== 0)
+      address = "http://" + address;
+    this.url = address;
+    if (port)
+      this.url += ":" + port;
   }
 
   private initUrl(): void {
     try {
-      console.log('adawdw');
-      this.settings.getValue('apiAddress')
-        .then((address) => {
+      this.settings
+        .load()
+        .then((data) => {
+
+          if (!data || !data.apiAddress)
+            return;
+
+          let address = data.apiAddress;
+          let port = data.apiPort;
+
+          if (!address)
+            return;
+
           if (address.indexOf('http://') !== 0 && address.indexOf('https://') !== 0)
             address = "http://" + address;
 
           this.url = address;
-          this.settings.getValue('apiPort')
-            .then((port) => {
-              this.url += ":" + port;
-            });
+
+          if (port)
+            this.url += ":" + port;
         });
     }
     catch (e) {
-
+      console.error(e);
     }
   }
 

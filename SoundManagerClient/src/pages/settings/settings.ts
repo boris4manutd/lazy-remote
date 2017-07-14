@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams } from 'ionic-angular';
 import { FormBuilder, FormGroup } from '@angular/forms';
-import { Settings } from "../../providers/providers";
+import { Settings, Api } from "../../providers/providers";
 
 /**
  * Generated class for the SettingsPage page.
@@ -22,8 +22,8 @@ export class SettingsPage {
   constructor(public navCtrl: NavController,
               public navParams: NavParams,
               private settings: Settings,
-              public formBuilder: FormBuilder) {
-
+              public formBuilder: FormBuilder,
+              private api: Api) {
   }
 
   public _buildForm(): void {
@@ -36,7 +36,14 @@ export class SettingsPage {
 
     // Watch the form for changes, and
     this.form.valueChanges.subscribe((v) => {
-      this.settings.merge(this.form.value);
+      this.settings
+        .merge(this.form.value)
+        .then((data) => {
+
+          // this will update values inside api provider
+          this.api.setAddress(data.apiAddress, data.apiPort);
+        });
+
     });
   }
 

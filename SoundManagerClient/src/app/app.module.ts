@@ -12,7 +12,6 @@ import { AppConfig } from './config';
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
 
-
 export function provideSettings(storage: Storage) {
   /**
    * The Settings provider takes a set of default settings for your app.
@@ -46,8 +45,8 @@ export function provideSettings(storage: Storage) {
   providers: [
     StatusBar,
     SplashScreen,
-    Api,
     { provide: Settings, useFactory: provideSettings, deps: [Storage] },
+    Api,
     { provide: ErrorHandler, useClass: IonicErrorHandler }
   ]
 })

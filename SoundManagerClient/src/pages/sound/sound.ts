@@ -4,6 +4,8 @@ import { Storage } from '@ionic/storage';
 
 import 'rxjs/Rx';
 
+import { SettingsPage } from '../pages';
+
 import { Api, Settings } from "../../providers/providers";
 
 /**
@@ -24,12 +26,15 @@ export class SoundPage {
   private isVolumeMutePressed: boolean;
   private isVolumeUnmutePressed: boolean;
 
+  private isMuted: boolean;
+
+  private hostOS: string;
+
   private balance: number;
 
   private serverNotSet: boolean = false;
 
-  constructor(public navCtrl: NavController, public navParams: NavParams, private storage: Storage, private api: Api, public toastCtrl: ToastController) {
-
+  constructor(public navCtrl: NavController, public navParams: NavParams, private storage: Storage, private api: Api, public toastCtrl: ToastController, private settings: Settings) {
     this.isVolumeDownPressed = this.isVolumeUpPressed = this.isVolumeMutePressed = this.isVolumeUnmutePressed = false;
   }
 
@@ -70,19 +75,12 @@ export class SoundPage {
   }
 
   public BalanceChanged($event): void {
-
-    var a = function () {
-    };
-
     this.PerformRequest("volume/balance", "balance=" + this.balance);
-
-    //*/ { "balance": this.balance }
-    //this.PerformPostRequest("volume", "balance", "balance=" + this.balance, a, a);
   }
 
   private PerformRequest(endpoint: string, data: any, activateButtonFunc?: ()=>void) {
 
-    if(this.serverNotSet) {
+    if (this.serverNotSet) {
       if (activateButtonFunc)
         activateButtonFunc();
       return;
@@ -90,7 +88,10 @@ export class SoundPage {
     this.api
       .post(endpoint, data)
       .subscribe(
-        (data)=> {
+        (serverResponse)=> {
+          let responseObj = JSON.parse(serverResponse.text());
+          this.isMuted = responseObj.isMuted;
+
           // succ
           if (activateButtonFunc)
             activateButtonFunc();
@@ -115,9 +116,36 @@ export class SoundPage {
       );
   }
 
-
   ionViewDidLoad() {
-    console.log('sound - ionViewDidLoad');
+    this.settings
+      .getValue('apiAddress')
+      .then((apiAddress)=> {
+        if (!apiAddress) {
+          this.navCtrl.setRoot(SettingsPage);
+          return;
+        }
+
+
+        this.settings
+          .getValue('apiPort')
+          .then((apiPort) => {
+            this.api.setAddress(apiAddress, apiPort);
+            this.api
+              .get('volume')
+              .subscribe((serverResponse)=> {
+                let responseObj = JSON.parse(serverResponse.text());
+                this.hostOS = responseObj.platformInfo.os;
+                this.isMuted = responseObj.isMuted;
+
+                this.balance = parseInt(responseObj.balance);
+              });
+
+          });
+
+      }, (error) => {
+        this.navCtrl.setRoot(SettingsPage);
+      });
+
   }
 
 }

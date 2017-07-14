@@ -1,6 +1,7 @@
 export var AppConfig = {
   apiAddress: null,
-  apiPort: null
+  apiPort: null,
+  hostOS: null
 };
 
 

@@ -12,8 +12,8 @@ interface iPlatform
     public function GetBalance();
     public function SetBalance($balance);
 
-	public function VolumeUp();
-	public function VolumeDown();
+	public function VolumeUp($balance = null);
+	public function VolumeDown($balance = null);
 
 	public function SetVolume($volume);
 	public function GetVolume();

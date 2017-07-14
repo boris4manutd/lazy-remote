@@ -24,8 +24,9 @@ class Linux implements iPlatform
      * Method for increasing volume by calling native program amixer.
      *
      */
-    public function VolumeUp()
+    public function VolumeUp($balance = null)
     {
+        $this->balance = $balance;
         $this->CalculateNewVolume(+self::VOLUME_STEP);
 
         shell_exec("amixer -D pulse sset Master {$this->volume['left']}%,{$this->volume['right']}%");
@@ -35,8 +36,9 @@ class Linux implements iPlatform
      * Method for decreasing volume by calling native program amixer.
      *
      */
-    public function VolumeDown()
+    public function VolumeDown($balance = null)
     {
+        $this->balance = $balance;
         $this->CalculateNewVolume(-self::VOLUME_STEP);
 
         shell_exec("amixer -D pulse sset Master {$this->volume['left']}%,{$this->volume['right']}%");

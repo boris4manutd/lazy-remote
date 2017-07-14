@@ -14,8 +14,7 @@ class SoundController extends Controller
     public function __construct()
     {
         $os = php_uname('s');
-        switch ($os)
-        {
+        switch ($os) {
             case "Windows NT":
                 $this->platform = new \App\Classes\Platforms\Windows();
                 break;
@@ -33,16 +32,28 @@ class SoundController extends Controller
         return $this->platform->GetStatus();
     }
 
-    public function VolumeUp()
+    public function VolumeUp(Request $request)
     {
-        $this->platform->VolumeUp();
+        $this->validate($request, [
+            'balance' => 'required|integer|min:-50|max:50'
+        ]);
+
+        $balance = $request->input('balance');
+
+        $this->platform->VolumeUp($balance);
 
         return $this->platform->GetStatus();
     }
 
-    public function VolumeDown()
+    public function VolumeDown(Request $request)
     {
-        $this->platform->VolumeDown();
+        $this->validate($request, [
+            'balance' => 'required|integer|min:-50|max:50'
+        ]);
+
+        $balance = $request->input('balance');
+
+        $this->platform->VolumeDown($balance);
 
         return $this->platform->GetStatus();
     }

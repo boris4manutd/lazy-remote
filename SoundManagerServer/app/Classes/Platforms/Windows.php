@@ -33,12 +33,12 @@ class Windows implements IPlatform
         $this->SetPlatformInfo();
     }
 
-    public function VolumeUp()
+    public function VolumeUp($balance = null)
     {
         shell_exec($this->nirCmd . " changesysvolume " . self::VOLUME_STEP);
     }
 
-    public function VolumeDown()
+    public function VolumeDown($balance = null)
     {
         shell_exec($this->nirCmd . " changesysvolume -" . self::VOLUME_STEP);
     }

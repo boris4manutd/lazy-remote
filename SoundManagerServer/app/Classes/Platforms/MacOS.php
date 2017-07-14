@@ -25,12 +25,12 @@ class MacOS implements iPlatform
         // TODO: Implement SetBalance() method.
     }
 
-    public function VolumeUp()
+    public function VolumeUp($balance = null)
     {
         // TODO: Implement VolumeUp() method.
     }
 
-    public function VolumeDown()
+    public function VolumeDown($balance = null)
     {
         // TODO: Implement VolumeDown() method.
     }

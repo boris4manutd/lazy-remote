@@ -1,10 +1,8 @@
 # Lazy remote
-
-## Info
 Lazy remote is software solution that allows user basic controlls on computer using mobile device. 
 
 ## Features
-Depending on computer operating system there are specific features, bellow is list of currently supported and tested operating systems
+Depending on computer operating system there are specific features, bellow is list of currently supported and tested operating systems.
 
 ### Ubuntu
 Supported features:

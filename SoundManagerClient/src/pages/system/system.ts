@@ -1,9 +1,9 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, ToastController } from 'ionic-angular';
 import { Storage } from '@ionic/storage';
 import { Http } from '@angular/http';
-import { Api } from '../../providers/providers';
-
+import { Api, Settings, InAppNotification } from '../../providers/providers';
+import { CommonPageClass } from '../../util/commonpageclass';
 
 /**
  * Generated class for the SystemPage page.
@@ -16,127 +16,90 @@ import { Api } from '../../providers/providers';
   selector: 'page-system',
   templateUrl: 'system.html',
 })
-export class SystemPage {
+export class SystemPage extends CommonPageClass {
 
   private systemOptions: any[];
+  private isLinux: boolean = false;
 
-  constructor(private _navCtrl: NavController, private navParams: NavParams, private _storage: Storage, private _http: Http, private api: Api) {
+  constructor(navCtrl: NavController, navParams: NavParams, storage: Storage, http: Http, api: Api, settings: Settings, inAppNotification: InAppNotification) {
+    super(navCtrl, navParams, storage, http, api, settings, inAppNotification);
+
+    // inside "method" functions, this isn't in object's scope, but instead in scope of his namespace {name, method, isActive}
+    let _me = this;
     this.systemOptions = [
       {
         name: "Shut Down",
-        method: this.ShutDown,
+        method: (__me: SystemPage = _me) => { // send _me to function so propper method could ne called
+          __me.executeSystemOperation("shutdown", 0);
+        },
         isActive: false
       },
       {
         name: "Reset",
-        method: this.Reset,
+        method: (__me: SystemPage = _me) => {
+          __me.executeSystemOperation("reset", 1);
+        },
         isActive: false
       },
       {
         name: "Sleep",
-        method: this.Sleep,
+        method: (__me: SystemPage = _me) => {
+          __me.executeSystemOperation("sleep", 2);
+        },
         isActive: false
       },
       {
         name: "Log off",
-        method: this.LogOff,
+        method: (__me: SystemPage = _me) => {
+
+          __me.executeSystemOperation("logoff", 3);
+        },
         isActive: false
       },
       {
         name: "Lock",
-        method: this.Lock,
+        method: (__me: SystemPage = _me) => {
+          __me.executeSystemOperation("lock", 4);
+        },
         isActive: false
       }
     ];
-  }
 
-  public ShutDown(): void {
-    if (this.systemOptions[0].isActive)
-      return;
-
-    this.systemOptions[0].isActive = true;
-
-    let activateButton = (): void => {
-      this.systemOptions[0].isActive = false;
-    };
-    this.PerformRequest("system/shutdown", {}, activateButton);
-  }
-
-  public Reset(): void {
-    if (this.systemOptions[1].isActive)
-      return;
-
-    this.systemOptions[1].isActive = true;
-
-
-    let activateButton = (): void => {
-      this.systemOptions[1].isActive = false;
-    };
-
-    this.PerformRequest("system/reset", {}, activateButton);
-  }
-
-  public Sleep(): void {
-    if (this.systemOptions[2].isActive)
-      return;
-
-    this.systemOptions[2].isActive = true;
-
-
-    let activateButton = (): void => {
-      this.systemOptions[2].isActive = false;
-    };
-
-    this.PerformRequest("system/sleep", {}, activateButton);
-  }
-
-  public  LogOff(): void {
-    if (this.systemOptions[3].isActive)
-      return;
-
-    this.systemOptions[3].isActive = true;
-
-
-    let activateButton = (): void => {
-      this.systemOptions[3].isActive = false;
-    };
-    this.PerformRequest("system/logoff", {}, activateButton);
-  }
-
-  public Lock(): void {
-    if (this.systemOptions[4].isActive)
-      return;
-
-    this.systemOptions[4].isActive = true;
-
-    let activateButton = (): void => {
-      this.systemOptions[4].isActive = false;
-    };
-    this.PerformRequest("system/lock", {}, activateButton);
-  }
-
-  private PerformRequest(endpoint: string, data: any, activateButtonFunc?: ()=>void) {
-    this.api
-      .post(endpoint, data)
-      .subscribe(
-        (data)=> {
-          // succ
-          if (activateButtonFunc)
-            activateButtonFunc();
-        },
-        (err)=> {
-          // fail
-          if (activateButtonFunc)
-            activateButtonFunc();
-        },
-        ()=> {
-
+    this
+      .settings
+      .getValue('hostOS')
+      .then((value) => {
+        if (value == "Linux") {
+          _me.systemOptions.splice(3, 1);
+          _me.isLinux = true;
         }
-      );
+      });
+  }
+
+  /**
+   * Method for executing requested system operation.
+   *
+   * @param operationName name of operation
+   * @param index index of selected operation
+   */
+  private executeSystemOperation(operationName: string, index: number) {
+    if (operationName == "lock" && this.isLinux) {
+      index = 3;
+    }
+
+    if (this.systemOptions[index].isActive)
+      return;
+
+    this.systemOptions[index].isActive = true;
+
+    let activateButton = (): void => {
+      this.systemOptions[index].isActive = false;
+    };
+    this.PerformRequestToServer("system/" + operationName, {}, activateButton);
   }
 
   ionViewDidLoad() {
-    console.log('ionViewDidLoad SystemPage');
+    super.RedirectIfSettingsNotSet();
   }
 
 }

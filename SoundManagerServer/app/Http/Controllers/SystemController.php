@@ -4,8 +4,6 @@ namespace App\Http\Controllers;
 
 use Log;
 use Laravel\Lumen\Routing\Controller;
-use Illuminate\Http\Request;
-use \App\Classes\Platforms\iPlatform;
 
 class SystemController extends Controller
 {
@@ -18,13 +16,13 @@ class SystemController extends Controller
 		switch ($os) 
 		{
 			case "Windows NT":
-				$this->platform = new \App\Classes\Platforms\Windows();
+				$this->platform = new \App\Classes\Components\System\Windows();
 				break;
 			case "Linux":
-				$this->platform = new \App\Classes\Platforms\Linux();
+				$this->platform = new \App\Classes\Components\System\Linux();
 				break;
 			default:
-				$this->platform = new \App\Classes\Platforms\MacOS();
+				$this->platform = new \App\Classes\Components\System\MacOS();
 			
 		}
 	}

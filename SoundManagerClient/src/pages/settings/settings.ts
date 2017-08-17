@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams } from 'ionic-angular';
-import { FormBuilder, FormGroup } from '@angular/forms';
-import { Settings, Api } from "../../providers/providers";
+import { IonicPage, NavController, NavParams, ToastController } from 'ionic-angular';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Settings, Api, InAppNotification } from "../../providers/providers";
 
 /**
  * Generated class for the SettingsPage page.
@@ -23,28 +23,73 @@ export class SettingsPage {
               public navParams: NavParams,
               private settings: Settings,
               public formBuilder: FormBuilder,
-              private api: Api) {
+              private api: Api,
+              private inAppNotification: InAppNotification) {
   }
 
   public _buildForm(): void {
-    let group: any = {
-      apiAddress: [this.options.apiAddress],
+    this.form = this.formBuilder.group({
+      apiAddress: [this.options.apiAddress, Validators.required],
       apiPort: [this.options.apiPort]
-    };
-
-    this.form = this.formBuilder.group(group);
-
-    // Watch the form for changes, and
-    this.form.valueChanges.subscribe((v) => {
-      this.settings
-        .merge(this.form.value)
-        .then((data) => {
-
-          // this will update values inside api provider
-          this.api.setAddress(data.apiAddress, data.apiPort);
-        });
-
     });
+  }
+
+  public Connect(): void {
+    let formData = this.form.value;
+
+    this.api.setAddress(formData.apiAddress, formData.apiPort);
+
+    try {
+      this.api
+        .get('')
+        .subscribe(
+          (val) => {
+            let data = val.json();
+            let currSettings = this.settings.allSettings;
+
+            currSettings.hostOS = data.os;
+            currSettings.apiAddress = formData.apiAddress;
+            currSettings.apiPort = formData.apiPort;
+
+            this.UpdateLocalSettings(currSettings);
+          },
+          (err)=> {
+            // fail
+
+            let defSettings = this.settings.defaultSettings;
+
+            /*defSettings.apiAddress = formData.apiAddress;
+             defSettings.apiPort = formData.apiPort;*/
+
+            this.settings
+              .merge(defSettings)
+              .then((data)=> {
+                this.inAppNotification.showToastNotification("Server can't be reached at provided address, please fill address and port(if needed) on Settings page.");
+              });
+          },
+          ()=> {
+
+          }
+        );
+    } catch (invalidURLException) {
+
+    }
+  }
+
+  /**
+   * Method that will update all settings required for application to work.
+   *
+   */
+  private UpdateLocalSettings(data) {
+    this.settings
+      .merge(data)
+      .then((data) => {
+        // this will update values inside api provider
+        this.inAppNotification.showToastNotification("Successfully connected to server.");
+        
+        this.api.setAddress(data.apiAddress, data.apiPort);
+      });
+
   }
 
   ionViewDidLoad() {

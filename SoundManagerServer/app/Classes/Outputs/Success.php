@@ -5,12 +5,11 @@ use Log;
 
 class Success 
 {
-	use Output;
+	use tOutput;
 	
 	public function __construct($message, $statusCode)
 	{
-		/*$this->messsage = $message;
-		$this->statusCode = $statusCode;*/
+		$this->messsage = $message;
+		$this->statusCode = $statusCode;
 	}
-
 }

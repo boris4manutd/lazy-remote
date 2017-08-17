@@ -1,4 +1,4 @@
-import { Injectable, EventEmitter } from '@angular/core';
+import { Injectable } from '@angular/core';
 
 import { Storage } from '@ionic/storage';
 
@@ -21,7 +21,7 @@ export class Settings {
   }
 
   load() {
-    let val =  this.storage.get(this.SETTINGS_KEY).then((value) => {
+    let val = this.storage.get(this.SETTINGS_KEY).then((value) => {
       if (value) {
         this.settings = value;
         return this._mergeDefaults(this._defaults);
@@ -42,6 +42,10 @@ export class Settings {
       }
     }
     return this.setAll(this.settings);
+  }
+
+  setDefault() {
+    return this.merge(this._defaults);
   }
 
   merge(settings: any) {
@@ -73,5 +77,9 @@ export class Settings {
 
   get allSettings() {
     return this.settings;
+  }
+
+  get defaultSettings() {
+    return this._defaults;
   }
 }

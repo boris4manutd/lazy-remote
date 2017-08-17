@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use Log;
 use Laravel\Lumen\Routing\Controller;
 use Illuminate\Http\Request;
-use \App\Classes\Platforms\iPlatform;
 
 class SoundController extends Controller
 {
@@ -16,14 +15,13 @@ class SoundController extends Controller
         $os = php_uname('s');
         switch ($os) {
             case "Windows NT":
-                $this->platform = new \App\Classes\Platforms\Windows();
+                $this->platform = new \App\Classes\Components\Sound\Windows();
                 break;
             case "Linux":
-                $this->platform = new \App\Classes\Platforms\Linux();
+                $this->platform = new \App\Classes\Components\Sound\Linux();
                 break;
             default:
-                $this->platform = new \App\Classes\Platforms\MacOS();
-
+                $this->platform = new \App\Classes\Components\Sound\MacOS();
         }
     }
 
@@ -35,7 +33,7 @@ class SoundController extends Controller
     public function VolumeUp(Request $request)
     {
         $this->validate($request, [
-            'balance' => 'required|integer|min:-50|max:50'
+            'balance' => 'required|integer|min:-50|max:50',
         ]);
 
         $balance = $request->input('balance');
@@ -48,7 +46,7 @@ class SoundController extends Controller
     public function VolumeDown(Request $request)
     {
         $this->validate($request, [
-            'balance' => 'required|integer|min:-50|max:50'
+            'balance' => 'required|integer|min:-50|max:50',
         ]);
 
         $balance = $request->input('balance');
@@ -63,7 +61,7 @@ class SoundController extends Controller
         $volume = $request->input('volume');
 
         $this->validate($request, [
-            'volume' => 'required|integer|min:0|max:100'
+            'volume' => 'required|integer|min:0|max:100',
         ]);
 
         $this->platform->SetVolume($volume);
@@ -77,11 +75,15 @@ class SoundController extends Controller
     private function ValidateInputVolume($volume)
     {
         $output = true;
-        if (!is_numeric($volume))
+        if (! is_numeric($volume))
+        {
             $output = false;
+        }
 
         if ($volume < 0 || $volume > 100)
+        {
             $output = false;
+        }
 
         return $output;
     }
@@ -106,7 +108,7 @@ class SoundController extends Controller
 
         Log::info(var_export($request->all(), true));
         $this->validate($request, [
-            'balance' => 'required|integer|min:-50|max:50'
+            'balance' => 'required|integer|min:-50|max:50',
         ]);
 
         $balance = $request->input('balance');
@@ -115,6 +117,4 @@ class SoundController extends Controller
 
         return $this->platform->GetStatus();
     }
-
-
 }

@@ -10,7 +10,11 @@ Supported features:
   * Increase/decrease volume
   * Mute/un-mute volume
   * Change balance
-
+* System feature
+* Shutdown
+  * Sleep
+  * Reset
+  * Lock
 ### Windows 10
 Supported features:
 * Volume feature

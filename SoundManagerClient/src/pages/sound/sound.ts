@@ -1,12 +1,12 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams, ToastController } from 'ionic-angular';
+import { Http } from "@angular/http";
+import { IonicPage, NavController, NavParams } from 'ionic-angular';
 import { Storage } from '@ionic/storage';
 
 import 'rxjs/Rx';
 
-import { SettingsPage } from '../pages';
-
-import { Api, Settings } from "../../providers/providers";
+import { Api, Settings, InAppNotification } from "../../providers/providers";
+import { CommonPageClass } from '../../util/commonpageclass';
 
 /**
  * Generated class for the SoundPage page.
@@ -19,7 +19,7 @@ import { Api, Settings } from "../../providers/providers";
   selector: 'page-sound',
   templateUrl: 'sound.html',
 })
-export class SoundPage {
+export class SoundPage extends CommonPageClass {
 
   private isVolumeDownPressed: boolean;
   private isVolumeUpPressed: boolean;
@@ -32,120 +32,116 @@ export class SoundPage {
 
   private balance: number;
 
-  private serverNotSet: boolean = false;
+  constructor(navCtrl: NavController, navParams: NavParams, storage: Storage, http: Http, api: Api, settings: Settings, inAppNotification: InAppNotification) {
+    super(navCtrl, navParams, storage, http, api, settings, inAppNotification);
 
-  constructor(public navCtrl: NavController, public navParams: NavParams, private storage: Storage, private api: Api, public toastCtrl: ToastController, private settings: Settings) {
     this.isVolumeDownPressed = this.isVolumeUpPressed = this.isVolumeMutePressed = this.isVolumeUnmutePressed = false;
+
+    this.settings
+      .getValue('hostOS')
+      .then((val) => {
+        this.hostOS = val;
+      });
   }
 
+  /**
+   * Volume increasing method.
+   *
+   * @constructor
+   */
   public VolumeUp(): void {
     this.isVolumeUpPressed = true;
     let activateButton = () => {
       this.isVolumeUpPressed = false;
     };
 
-    this.PerformRequest("volume/up", "balance=" + this.balance, activateButton);
+    this.PerformRequestToServer("volume/up", "balance=" + this.balance, activateButton, activateButton);
   }
 
+  /**
+   * Volume decreasing method.
+   *
+   * @constructor
+   */
   public VolumeDown(): void {
     this.isVolumeDownPressed = true;
     let activateButton = () => {
       this.isVolumeDownPressed = false;
     };
 
-    this.PerformRequest("volume/down", "balance=" + this.balance, activateButton);
+    this.PerformRequestToServer("volume/down", "balance=" + this.balance, activateButton);
   }
 
+  /**
+   * Volume mute method.
+   *
+   * @constructor
+   */
   public VolumeMute(): void {
     this.isVolumeMutePressed = true;
     let activateButton = () => {
       this.isVolumeMutePressed = false;
     };
 
-    this.PerformRequest("volume/mute", {}, activateButton);
+    this.PerformRequestToServer("volume/mute", {}, activateButton, () => {
+      this.ToggleMute();
+    });
   }
 
+  /**
+   * Volume un-mute method.
+   *
+   * @constructor
+   */
   public VolumeUnmute(): void {
     this.isVolumeUnmutePressed = true;
     let activateButton = () => {
       this.isVolumeUnmutePressed = false;
     };
 
-    this.PerformRequest("volume/unmute", {}, activateButton);
+    this.PerformRequestToServer("volume/unmute", {}, activateButton, () => {
+      this.ToggleMute();
+    });
   }
 
+  /**
+   * Event for balance change.
+   *
+   * @param $event
+   * @constructor
+   */
   public BalanceChanged($event): void {
-    this.PerformRequest("volume/balance", "balance=" + this.balance);
+    this.PerformRequestToServer("volume/balance", "balance=" + this.balance);
   }
 
-  private PerformRequest(endpoint: string, data: any, activateButtonFunc?: ()=>void) {
+  /**
+   * Toggle mute state (UI related function).
+   *
+   * @constructor
+   */
+  private ToggleMute(): void {
+    this.isMuted = !this.isMuted;
+  }
 
-    if (this.serverNotSet) {
-      if (activateButtonFunc)
-        activateButtonFunc();
-      return;
-    }
+  /**
+   * Method that will be called to obtain sound data from server (currently, valid only for Linux hosts).
+   *
+   * @constructor
+   */
+  private GetVolumeInfoFromServer(): void {
     this.api
-      .post(endpoint, data)
-      .subscribe(
-        (serverResponse)=> {
-          let responseObj = JSON.parse(serverResponse.text());
-          this.isMuted = responseObj.isMuted;
+      .get('volume')
+      .subscribe((response)=> {
+        let data = response.json();
 
-          // succ
-          if (activateButtonFunc)
-            activateButtonFunc();
-        },
-        (err)=> {
-          // fail
-          if (activateButtonFunc)
-            activateButtonFunc();
-
-          this.serverNotSet = true;
-
-          let toast = this.toastCtrl.create({
-            message: "Server can't be reached at provided address, please fill address and port(if needed) on Settings page.",
-            duration: 3000,
-            position: 'top'
-          });
-          toast.present();
-        },
-        ()=> {
-
-        }
-      );
+        this.isMuted = data.isMuted;
+        this.balance = parseInt(data.balance);
+      });
   }
 
   ionViewDidLoad() {
-    this.settings
-      .getValue('apiAddress')
-      .then((apiAddress)=> {
-        if (!apiAddress) {
-          this.navCtrl.setRoot(SettingsPage);
-          return;
-        }
-
-
-        this.settings
-          .getValue('apiPort')
-          .then((apiPort) => {
-            this.api.setAddress(apiAddress, apiPort);
-            this.api
-              .get('volume')
-              .subscribe((serverResponse)=> {
-                let responseObj = JSON.parse(serverResponse.text());
-                this.hostOS = responseObj.platformInfo.os;
-                this.isMuted = responseObj.isMuted;
-
-                this.balance = parseInt(responseObj.balance);
-              });
-
-          });
-
-      }, (error) => {
-        this.navCtrl.setRoot(SettingsPage);
-      });
-
+    this.RedirectIfSettingsNotSet(() => {
+      this.GetVolumeInfoFromServer();
+    });
   }
-
 }

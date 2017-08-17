@@ -22,32 +22,28 @@ export class Api {
   }
 
   private initUrl(): void {
-    try {
-      this.settings
-        .load()
-        .then((data) => {
 
-          if (!data || !data.apiAddress)
-            return;
+    this.settings
+      .load()
+      .then((data) => {
 
-          let address = data.apiAddress;
-          let port = data.apiPort;
+        if (!data || !data.apiAddress)
+          return;
 
-          if (!address)
-            return;
+        let address = data.apiAddress;
+        let port = data.apiPort;
 
-          if (address.indexOf('http://') !== 0 && address.indexOf('https://') !== 0)
-            address = "http://" + address;
+        if (!address)
+          return;
 
-          this.url = address;
+        if (address.indexOf('http://') !== 0 && address.indexOf('https://') !== 0)
+          address = "http://" + address;
 
-          if (port)
-            this.url += ":" + port;
-        });
-    }
-    catch (e) {
-      console.error(e);
-    }
+        this.url = address;
+
+        if (port)
+          this.url += ":" + port;
+      });
   }
 
   get(endpoint: string, params?: any, options?: RequestOptions) {
@@ -67,6 +63,16 @@ export class Api {
     }
 
     return this.http.get(this.url + '/' + endpoint, options);
+  }
+
+  ping() {
+    try {
+      return this.http.get(this.url);
+    } catch (e) {
+      console.info('catch:');
+      console.error(e);
+    }
+
   }
 
   post(endpoint: string, body: any, options?: RequestOptions) {

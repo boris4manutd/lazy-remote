@@ -5,9 +5,10 @@ import { Storage, IonicStorageModule } from '@ionic/storage';
 import { HttpModule } from '@angular/http';
 
 import { MyApp } from './app.component';
-import { /*SystemPage, */SoundPage, SettingsPage } from '../pages/pages';
+import { SystemPage, SoundPage, SettingsPage } from '../pages/pages';
 
-import { Api, Settings } from '../providers/providers';
+import { Api, Settings, InAppNotification } from '../providers/providers';
+import { CommonPageClass } from '../util/util';
 import { AppConfig } from './config';
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
@@ -25,7 +26,7 @@ export function provideSettings(storage: Storage) {
 @NgModule({
   declarations: [
     MyApp,
-    //SystemPage,
+    SystemPage,
     SoundPage,
     SettingsPage
   ],
@@ -38,7 +39,7 @@ export function provideSettings(storage: Storage) {
   bootstrap: [IonicApp],
   entryComponents: [
     MyApp,
-    //SystemPage,
+    SystemPage,
     SoundPage,
     SettingsPage
   ],
@@ -47,7 +48,8 @@ export function provideSettings(storage: Storage) {
     SplashScreen,
     { provide: Settings, useFactory: provideSettings, deps: [Storage] },
     Api,
-    { provide: ErrorHandler, useClass: IonicErrorHandler }
+    { provide: ErrorHandler, useClass: IonicErrorHandler },
+    InAppNotification
   ]
 })
 export class AppModule {

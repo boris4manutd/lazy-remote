@@ -20,7 +20,7 @@
                 <ion-col col-12>
                     <ion-item no-padding>
                         <ion-label stacked>Computer address</ion-label>
-                        <ion-input type="text" formControlName="apiAddress"></ion-input>
+                        <ion-input type="text" formControlName="apiAddress" required minlength="6"></ion-input>
                     </ion-item>
                 </ion-col>
             </ion-row>
@@ -30,6 +30,11 @@
                         <ion-label stacked>Computer port</ion-label>
                         <ion-input type="number" formControlName="apiPort"></ion-input>
                     </ion-item>
+                </ion-col>
+            </ion-row>
+            <ion-row>
+                <ion-col col-12>
+                    <button ion-button full (click)="Connect()" [disabled]="!form.valid">Connect</button>
                 </ion-col>
             </ion-row>
         </ion-grid>
